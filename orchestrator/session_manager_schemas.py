@@ -107,7 +107,3 @@ class SessionManagerResponse(BaseModel):
                 "transition_taken": "calm_welcome → calm_breath_observation"
             }
         }
-
-        ## Ritesh Oraon ##
-        #"process_text":"Breathing init",
-        ####################################

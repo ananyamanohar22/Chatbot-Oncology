@@ -25,6 +25,10 @@ from classifier.simple_classifier import classifier
 
 from api.schemas import ChatRequest, ChatResponse, ErrorResponse
 
+from library.models import LibraryItem
+from states.models import State
+from processes.models import Process
+from db import SessionLocal
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -106,8 +110,6 @@ async def create_session(request: CreateSessionRequest):
             status_code=400,
             detail=str(e)
         )
-
-
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> ChatResponse:
     """
@@ -196,6 +198,152 @@ async def docs():
     """
     return {"message": "API docs available at /docs (Swagger UI)"}
 
+
+@app.get("/sessions/{session_id}")
+async def get_session(session_id: str):
+    """
+    Fetch a session by ID with process and state details.
+    """
+    try:
+        from uuid import UUID
+        from sessions.models import Session
+        from processes.models import Process
+        from states.models import State
+
+        db = SessionLocal()
+        session = db.query(Session).filter(Session.id == UUID(session_id)).first()
+
+        if not session:
+            db.close()
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        # Get process details
+        process = db.query(Process).filter(Process.id == session.process_id).first()
+        process_code = process.code if process else None
+        process_name = process.name if process else None
+
+        # Get current state details
+        state = db.query(State).filter(State.id == session.current_state_id).first() if session.current_state_id else None
+        state_code = state.code if state else None
+        state_name = state.name if state else None
+
+        db.close()
+
+        return {
+            "session_id": str(session.id),
+            "patient_id": session.patient_id,
+            "process_id": str(session.process_id),
+            "process_code": process_code,
+            "process_name": process_name,
+            "current_state_id": str(session.current_state_id) if session.current_state_id else None,
+            "current_state_code": state_code,
+            "current_state_name": state_name,
+            "started_at": session.started_at.isoformat(),
+            "ended_at": session.ended_at.isoformat() if session.ended_at else None
+        }
+    except Exception as e:
+        logger.error(f"[API] Error fetching session: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/library-items/{item_id}")
+async def get_library_item(item_id: str):
+    """
+    Fetch a single library item by ID.
+
+    used to get technique names and details from database.
+
+    Args:
+    item_id: Item IDitem_id: UUID of library item
+
+    Returns:
+        Library item with title, kind, body, metadata
+
+    """
+
+    try:
+        db = SessionLocal()
+        item = db.query(LibraryItem).filter(LibraryItem.id == item_id).first()
+        db.close()
+
+        if not item:
+            raise HTTPException(status_code=404, detail="Library Item not found")
+
+        return {
+            "id": str(item.id),
+            "kind": item.kind,
+            "title": item.title,
+            "body": item.body,
+            "metadata": item.item_metadata,
+        }
+    except Exception as e:
+        logger.error(f"[API] Error fetching library item: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/states/{state_code}")
+async def get_state(state_code: str):
+    """
+    Fetch a state by code (e.g., 'introduction', 'breathing', 'anxious').
+
+    Used to get emotion/state names from database.
+
+    Args:
+        state_code: State code (e.g., 'anxious', 'calm')
+
+    Returns:
+        State with code, name, description
+    """
+    try:
+        db = SessionLocal()
+        state = db.query(State).filter(State.code == state_code).first()
+        db.close()
+
+        if not state:
+            raise HTTPException(status_code=404, detail="State not found")
+
+        return {
+            "id": str(state.id),
+            "code": state.code,
+            "name": state.name,
+            "description": state.description
+        }
+    except Exception as e:
+        logger.error(f"[API] Error fetching state: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/processes/{process_code}")
+async def get_process(process_code: str):
+    """
+    Fetch a process by code (e.g., 'guided_imagery_v1').
+
+    Used to get process name and definition from database.
+
+    Args:
+        process_code: Process code (e.g., 'guided_imagery_v1')
+
+    Returns:
+        Process with code, name, description, definition
+    """
+    try:
+        db = SessionLocal()
+        process = db.query(Process).filter(Process.code == process_code).first()
+        db.close()
+
+        if not process:
+            raise HTTPException(status_code=404, detail="Process not found")
+
+        return {
+            "id": str(process.id),
+            "code": process.code,
+            "name": process.name,
+            "description": process.description,
+            "definition": process.definition,
+            "is_active": process.is_active
+        }
+    except Exception as e:
+        logger.error(f"[API] Error fetching process: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

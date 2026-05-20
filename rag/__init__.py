@@ -1,8 +1,10 @@
 """
 rag/
-Retrieval-Augmented Generation module.
+RAG (Retrieval Augmented Generation) system for response retrieval and synthesis.
 
-Handles retrieving context and generating personalized responses with LLM.
+Modules:
+- retriever.py: Retrieves response templates based on patient queries
+- llm_generator.py: Synthesizes final responses using LLM
 """
 
 from .retriever import RAGRetriever

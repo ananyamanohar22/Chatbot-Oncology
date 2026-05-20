@@ -27,10 +27,10 @@ class RAGRetriever:
 
     @staticmethod
     def retrieve_context(
-        session_id: uuid.UUID,
-        current_state_id: uuid.UUID,
-        message: str,
-        emotion: str
+            session_id: uuid.UUID,
+            current_state_id: uuid.UUID,
+            message: str,
+            emotion: str
     ) -> Dict[str, Any]:
         """
         Retrieve all relevant context for LLM generation.
