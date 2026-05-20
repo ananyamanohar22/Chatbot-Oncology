@@ -201,6 +201,10 @@ class SessionManager:
         content_data = orchestrator_response.content
         transition_taken = orchestrator_response.transition_taken
 
+        ### Ritesh Oraon ###
+        process_data = orchestrator_response.process   # Find if this can be implemented
+        #####################
+
         # Helper to safely get value from dict or object
         def get_attr(obj, key):
             if isinstance(obj, dict):
@@ -239,11 +243,16 @@ class SessionManager:
             session_id=get_attr(session_data, "id"),
             current_state=current_state,
             content=content,
+            process_text = get_attr(process_data, "name"),
             llm_response=llm_response,
             message_count=message_count,
             started_at=get_attr(session_data, "started_at"),
             transition_taken=transition_taken,
         )
+
+        ### Ritesh Oraon ###
+        #process_text = process_data.name,
+        ####################
 
         return response
 

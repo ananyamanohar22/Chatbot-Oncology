@@ -60,6 +60,15 @@
             border-radius: 6px;
         }
 
+        /* Ritesh added */
+        .process-info {
+            display: flex;
+            justify-content: center; /* or space-around if you want */
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
         /* Chat Area */
         .chat-area {
             flex: 1;
@@ -257,6 +266,13 @@
                 flex-direction: column;
                 gap: 8px;
             }
+
+            /* Ritesh added */
+            .process-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            /* ------------- */
         }
     </style>
 </head>
@@ -279,6 +295,14 @@
                     <span id="detectedEmotion">-</span>
                 </div>
             </div>
+            <!-- Ritesh added -->
+            <div class="process-info">
+                <div>
+                    <strong>Process:</strong>
+                    <span id="process_check">-</span>
+                </div>
+            </div>
+            <!-- ------------- -->
         </div>
 
         <!-- Chat Area -->
@@ -476,6 +500,11 @@
                 document.getElementById('detectedEmotion').textContent =
                     data.emotion.charAt(0).toUpperCase() + data.emotion.slice(1);
             }
+            // Ritesh Oraon //
+            if (data.process_text){
+                document.getElementById('process_check').textContent = data.process_text;
+            }
+            ////
         }
     </script>
 </body>

@@ -58,6 +58,9 @@ class SessionManagerResponse(BaseModel):
     """
     session_id: UUID = Field(..., description="Session identifier")
     current_state: StateInfo = Field(..., description="Current state information")
+    ### RItesh Oraon ###
+    process_text: str = Field(..., description="Process being followed")
+    ####################
 
     # Content to present to user
     content: List[LibraryItemResponse] = Field(
@@ -90,6 +93,7 @@ class SessionManagerResponse(BaseModel):
                     "state_code": "calm_breath_observation",
                     "state_name": "Observe Your Breath"
                 },
+                "process_text":"Breathing init",
                 "content": [
                     {
                         "kind": "script",
@@ -103,3 +107,7 @@ class SessionManagerResponse(BaseModel):
                 "transition_taken": "calm_welcome → calm_breath_observation"
             }
         }
+
+        ## Ritesh Oraon ##
+        #"process_text":"Breathing init",
+        ####################################

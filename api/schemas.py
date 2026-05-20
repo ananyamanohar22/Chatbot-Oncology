@@ -55,6 +55,9 @@ class ChatResponse(BaseModel):
     session_id: UUID = Field(..., description="Session identifier")
     current_state: StateInfo = Field(..., description="Current state info")
     emotion: Optional[str] = Field(default=None, description="Detected emotion from classifier")
+    ### RItesh Oraon ###
+    process_text: str = Field(..., description="Process being followed")
+    ####################
     content: list[LibraryContent] = Field(..., description="Library content for context")
     llm_response: str = Field(..., description="Personalized response from Claude LLM")
     message_count: int = Field(..., description="Total messages in session")
